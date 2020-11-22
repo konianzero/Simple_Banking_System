@@ -17,8 +17,6 @@ public class BankingSystem {
                                                "0. Exit";
 
     private static final String CARD_CREATED = "\nYour card has been created";
-    private static final String CARD_NUMBER = "Your card number:\n%s";
-    private static final String CARD_PIN = "Your card PIN:\n%s";
     private static final String ENTER_NUMBER = "\nEnter your card number:";
     private static final String ENTER_PIN = "Enter your PIN:";
     private static final String WRONG_NUMBER = "\nWrong card number or PIN!";
@@ -57,8 +55,7 @@ public class BankingSystem {
         accounts.add(account);
 
         System.out.println(CARD_CREATED);
-        System.out.println(String.format(CARD_NUMBER, account.getCardNumber()));
-        System.out.println(String.format(CARD_PIN, account.getPin()));
+        System.out.println(account);
     }
 
     private void logIn() {
@@ -68,12 +65,10 @@ public class BankingSystem {
         String pin = scanner.next();
 
         accounts.stream()
-                .filter(a -> a.getCardNumber().equals(number) && a.getPin().equals(pin))
+                .filter(a -> a.verifyAccess(number, pin))
                 .findFirst()
                 .ifPresentOrElse((a) -> {
-                                     System.out.println(SUCCESS_LOGIN);
                                      accountMenu(a);
-                                     System.out.println(SUCCESS_LOGOUT);
                                  },
                                  () -> {
                                      System.out.println(WRONG_NUMBER);
@@ -82,6 +77,7 @@ public class BankingSystem {
     }
 
     private void accountMenu(Account account) {
+        System.out.println(SUCCESS_LOGIN);
         while (true) {
             System.out.println(ACCOUNT_MENU);
             switch (scanner.nextInt()) {
@@ -89,6 +85,7 @@ public class BankingSystem {
                     System.out.println(String.format(BALANCE, account.getBalance()));
                     break;
                 case 2:
+                    System.out.println(SUCCESS_LOGOUT);
                     return;
                 case 0:
                     exit();
