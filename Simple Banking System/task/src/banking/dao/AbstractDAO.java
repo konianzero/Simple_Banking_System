@@ -2,77 +2,28 @@ package banking.dao;
 
 import org.sqlite.SQLiteDataSource;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 abstract class AbstractDAO implements DAO {
 
     private SQLiteDataSource dataSource;
-    private Connection connection;
-    private Statement statement;
 
     public AbstractDAO(String databaseName) {
         String pathToDatabase = "./";
-        String url = "jdbc:sqlite:" + pathToDatabase + databaseName;
+        String url = String.format("jdbc:sqlite:%s%s", pathToDatabase, databaseName);
 
         dataSource = new SQLiteDataSource();
         dataSource.setUrl(url);
     }
 
-    protected ResultSet select(String query) throws SQLException {
-        return statement.executeQuery(query);
-    }
-
-    protected void update(String query) throws SQLException {
-        statement.executeUpdate(query);
-    }
-
-    protected void statementPreparation() {
-        createConnection();
-        createStatement();
-    }
-
-    protected void statementCompletion() {
-        closeStatement();
-        closeConnection();
-    }
-
-    private void createConnection() {
+    protected Connection createConnection() {
+        Connection connection = null;
         try {
             connection = dataSource.getConnection();
-        } catch (SQLException throwables) {
-            System.out.println(throwables.getMessage());
+        } catch (SQLException se) {
+            System.out.println(se.getMessage());
         }
-    }
-
-    private void createStatement() {
-        try {
-            statement = connection.createStatement();
-        } catch (SQLException throwables) {
-            System.out.println(throwables.getMessage());
-        }
-    }
-
-    private void closeStatement() {
-        try {
-            if (statement != null) {
-                statement.close();
-            }
-        } catch (SQLException throwables) {
-            System.out.println(throwables.getMessage());
-        }
-    }
-
-    private void closeConnection() {
-        try {
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (SQLException throwables) {
-            System.out.println(throwables.getMessage());
-        }
+        return connection;
     }
 }
 

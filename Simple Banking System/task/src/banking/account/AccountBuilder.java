@@ -5,12 +5,59 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-class AccountBuilder {
+public class AccountBuilder {
     private static final String BIN = "400000";
     private static Random random = new Random();
 
-    public static Account build() {
-        return new Account(generateCardNumber(), generatePin());
+    public static BankAccount buildNew() {
+        return new BankAccount(generateCardNumber(), generatePin(), 0);
+    }
+
+    public static BankAccount build(String cardNumber, String pin, int balance) {
+        return new BankAccount(cardNumber, pin, balance);
+    }
+
+    public static BankAccount buildTransferAccount(String number, int money) {
+        return new BankAccount(number, null, money);
+    }
+
+    private static class BankAccount implements Account {
+        private final String cardNumber;
+        private final String pin;
+        private int balance;
+
+        public BankAccount(String cardNumber, String pin, int balance) {
+            this.cardNumber = cardNumber;
+            this.pin = pin;
+            this.balance = balance;
+        }
+
+        public String getCardNumber() {
+            return cardNumber;
+        }
+
+        public String getPin() {
+            return pin;
+        }
+
+        public int getBalance() {
+            return balance;
+        }
+
+        public void addToBalance(int income) {
+            this.balance += income;
+        }
+
+        public boolean verifyAccess(String cardNumber, String pin) {
+            return this.cardNumber.equals(cardNumber) && this.pin.equals(pin);
+        }
+
+        public String info() {
+            return "Your card number:\n"
+                    + cardNumber
+                    + "\nYour card PIN:\n"
+                    + pin;
+        }
     }
 
     private static String generateCardNumber() {
@@ -20,7 +67,8 @@ class AccountBuilder {
                  .skip(6)
                  .forEach(i -> cardNumber[i] = getInt());
 
-        return addCheckSum(cardNumber);
+        cardNumber[cardNumber.length - 1] = calcCheckSum(cardNumber);
+        return arrayToString(cardNumber);
     }
 
     private static void setBIN(int[] cardNumber, int index) {
@@ -31,10 +79,10 @@ class AccountBuilder {
 
     /**
      * Generates a check sum with Luhn algorithm.
-     * @param cardNumber the array with card number digits without checksum
-     * @return card number with checksum
+     * @param cardNumber the array with card number digits
+     * @return checksum
      */
-    private static String addCheckSum(int[] cardNumber) {
+    public static int calcCheckSum(int[] cardNumber) {
         int sum = IntStream.range(0, cardNumber.length - 1)
                            .map(i -> {
                                 int digit = cardNumber[i];
@@ -48,9 +96,7 @@ class AccountBuilder {
                             }).sum();
 
         int checkSum = 10 - (sum % 10);
-        cardNumber[cardNumber.length - 1] = checkSum == 10 ? 0 : checkSum;
-
-        return arrayToString(cardNumber);
+        return checkSum == 10 ? 0 : checkSum;
     }
 
     private static String generatePin() {
@@ -60,7 +106,7 @@ class AccountBuilder {
 
     private static String arrayToString(int[] array) {
         return Arrays.stream(array)
-                     .mapToObj(i -> String.valueOf(i))
+                     .mapToObj(String::valueOf)
                      .collect(Collectors.joining());
     }
 
@@ -68,4 +114,3 @@ class AccountBuilder {
         return random.nextInt(10);
     }
 }
-
