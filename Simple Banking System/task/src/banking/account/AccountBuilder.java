@@ -5,7 +5,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class AccountBuilder {
+class AccountBuilder {
     private static final String BIN = "400000";
     private static Random random = new Random();
 

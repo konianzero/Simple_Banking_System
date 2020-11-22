@@ -1,10 +1,9 @@
 package banking;
 
 import banking.account.Account;
-import banking.account.AccountBuilder;
+import banking.account.AccountService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class BankingSystem {
@@ -25,9 +24,8 @@ public class BankingSystem {
     private static final String SUCCESS_LOGOUT = "\nYou have successfully logged out!";
     private static final String EXIT_MSG = "\nBye!";
 
-    private List<Account> accounts = new ArrayList<>();
-
     private Scanner scanner;
+    private AccountService accountService;
 
     public BankingSystem(Scanner scanner) {
         this.scanner = scanner;
@@ -50,9 +48,12 @@ public class BankingSystem {
         }
     }
 
+    public void setService(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
     private void createAccount() {
-        Account account = AccountBuilder.build();
-        accounts.add(account);
+        Account account = accountService.createAccount();
 
         System.out.println(CARD_CREATED);
         System.out.println(account);
@@ -64,16 +65,14 @@ public class BankingSystem {
         System.out.println(ENTER_PIN);
         String pin = scanner.next();
 
-        accounts.stream()
-                .filter(a -> a.verifyAccess(number, pin))
-                .findFirst()
-                .ifPresentOrElse((a) -> {
-                                     accountMenu(a);
-                                 },
-                                 () -> {
-                                     System.out.println(WRONG_NUMBER);
-                                     return;
-                                 });
+        Optional<Account> accountOptional = accountService.getAccount(number, pin);
+
+        if (accountOptional.isPresent()) {
+            accountMenu(accountOptional.get());
+        } else {
+            System.out.println(WRONG_NUMBER);
+            return;
+        }
     }
 
     private void accountMenu(Account account) {

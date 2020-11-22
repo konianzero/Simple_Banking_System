@@ -11,6 +11,14 @@ public class Account {
         balance = 0;
     }
 
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public String getPin() {
+        return pin;
+    }
+
     public boolean verifyAccess(String cardNumber, String pin) {
         return this.cardNumber.equals(cardNumber) && this.pin.equals(pin);
     }
