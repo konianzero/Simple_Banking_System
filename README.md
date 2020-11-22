@@ -4,4 +4,7 @@
 __Hard__:
 
 - Simple Banking System
-
+    - Card anatomy
+    - Luhn algorithm
+    - I'm so lite
+    - Advanced system

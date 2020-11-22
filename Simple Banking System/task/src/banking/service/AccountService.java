@@ -30,13 +30,20 @@ public class AccountService {
         return Optional.ofNullable(accountDAO.get(number, pin));
     }
 
-    public boolean updateAccount(Account account) {
-        return accountDAO.update(account);
+    public Optional<Account> updateAccount(Account account) {
+        if (accountDAO.update(account)) {
+            return getAccount(account.getCardNumber(), account.getPin());
+        }
+        return Optional.empty();
     }
 
-    public boolean transfer(Account from, String number, int money) {
+    public Optional<Account> transfer(Account from, String number, int money) {
         Account to = AccountBuilder.buildTransferAccount(number, money);
-        return accountDAO.transfer(from, to);
+
+        if (accountDAO.transfer(from, to)) {
+            return getAccount(from.getCardNumber(), from.getPin());
+        }
+        return Optional.empty();
     }
 
     public boolean checkNumber(String number) {

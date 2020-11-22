@@ -3,7 +3,6 @@ package banking.view;
 import banking.account.Account;
 import banking.service.AccountService;
 
-import java.util.Optional;
 import java.util.Scanner;
 
 public class BankingSystem {
@@ -69,12 +68,13 @@ public class BankingSystem {
     }
 
     private void createAccount() {
-        Optional<Account> accountOptional = accountService.createAccount();
-
-        if (accountOptional.isPresent()) {
-            System.out.println(CARD_CREATED);
-            System.out.println(accountOptional.get().info());
-        }
+        accountService.createAccount()
+                      .ifPresent(
+                              a -> {
+                                  System.out.println(CARD_CREATED);
+                                  System.out.println(a.info());
+                              }
+                      );
     }
 
     private void logIn() {
@@ -83,14 +83,14 @@ public class BankingSystem {
         System.out.println(ENTER_PIN);
         String pin = scanner.next();
 
-        Optional<Account> accountOptional = accountService.getAccount(number, pin);
-
-        if (accountOptional.isPresent()) {
-            accountMenu(accountOptional.get());
-        } else {
-            System.out.println(WRONG_CARD_DATA);
-            return;
-        }
+        accountService.getAccount(number, pin)
+                      .ifPresentOrElse(
+                              a -> accountMenu(a),
+                              () -> {
+                                  System.out.println(WRONG_CARD_DATA);
+                                  return;
+                              }
+                      );
     }
 
     private void accountMenu(Account a) {
@@ -130,11 +130,14 @@ public class BankingSystem {
         int income = scanner.nextInt();
         
         account.addToBalance(income);
-        
-        if (accountService.updateAccount(account)) {
-            account = accountService.getAccount(account.getCardNumber(), account.getPin()).get();
-            System.out.println(INCOME_ADDED);
-        }
+
+        accountService.updateAccount(account)
+                      .ifPresent(
+                              a -> {
+                                  account = a;
+                                  System.out.println(INCOME_ADDED);
+                              }
+                      );
     }
 
     private void doTransfer() {
@@ -163,11 +166,14 @@ public class BankingSystem {
         }
 
         account.addToBalance(-money);
-        
-        if (accountService.transfer(account, transferCardNumber, money)) {
-            account = accountService.getAccount(account.getCardNumber(), account.getPin()).get();
-            System.out.println(TRANSFER_SUCCESS);
-        }
+
+        accountService.transfer(account, transferCardNumber, money)
+                      .ifPresent(
+                              a -> {
+                                  account = a;
+                                  System.out.println(TRANSFER_SUCCESS);
+                              }
+                      );
     }
 
     private void closeAccount() {
