@@ -39,7 +39,7 @@ public class BankingSystem {
     private static final String CARD_NOT_EXIST = "Such a card does not exist.";
     private static final String NOT_ENOUGH_MONEY = "Not enough money!";
 
-    private Scanner scanner;
+    private final Scanner scanner;
     private AccountService accountService;
     private Account account;
 

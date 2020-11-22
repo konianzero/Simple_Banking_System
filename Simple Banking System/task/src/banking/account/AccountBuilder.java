@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 public class AccountBuilder {
     private static final String BIN = "400000";
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     public static BankAccount buildNew() {
         return new BankAccount(generateCardNumber(), generatePin(), 0);

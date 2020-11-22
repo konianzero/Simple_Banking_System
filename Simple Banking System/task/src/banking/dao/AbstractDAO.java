@@ -6,7 +6,7 @@ import java.sql.*;
 
 abstract class AbstractDAO implements DAO {
 
-    private SQLiteDataSource dataSource;
+    private final SQLiteDataSource dataSource;
 
     public AbstractDAO(String databaseName) {
         String pathToDatabase = "./";
